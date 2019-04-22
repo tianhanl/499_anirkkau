@@ -61,9 +61,6 @@ using chirp::StreamReply;
 using chirp::StreamRequest;
 using namespace std::chrono;
 
-// Empty log id used to indicate current list is empty
-const std::string& kEmptyLodId = "empty_log";
-
 // gRPC client to communicate with ServiceLayerServiceImpl
 class ServiceLayerClient {
  public:

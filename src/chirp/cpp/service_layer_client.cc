@@ -154,6 +154,9 @@ std::string ServiceLayerClient::monitor(const std::string& username) {
 bool ServiceLayerClient::stream(const std::string& username,
                                 const std::string& hashtag,
                                 std::function<void(Chirp)> handle_response) {
+  // Empty log id used to indicate current list is empty
+  const std::string& kEmptyLodId = "empty_log";
+
   // Validates hashtag
   // A hashtag is defined as any substring, separated by whitespace characters,
   // where the substring begins with “#” and has one or more non-blank
@@ -186,18 +189,18 @@ bool ServiceLayerClient::stream(const std::string& username,
       // If the log is not empty and from has been synchronized, handle response
       // with chirp
       if (chirp.id() != kEmptyLodId && from != "") {
-        handle_reponse(chirp)
+        handle_response(chirp);
       }
       from = chirp.id();
     }
 
     // If there is a error return false to stop the loop
-    Status status = reader.Finish();
+    Status status = reader->Finish();
     if (!status.ok()) {
       return false;
     }
 
-    std::this_thread::sleep_for(seconds(2))
+    std::this_thread::sleep_for(seconds(2));
   }
 
   return true;
