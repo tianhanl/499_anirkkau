@@ -127,7 +127,7 @@ std::string ServiceLayerClient::monitor(const std::string& username) {
   // Container for the data we expect from the server.
   MonitorReply reply;
 
-  std::unique_ptr<ClientReader<MonitorReply> > reader(
+  std::unique_ptr<ClientReader<MonitorReply>> reader(
       stub_->monitor(&context, request));
 
   std::string chirp_text;
@@ -161,6 +161,43 @@ bool ServiceLayerClient::stream(const std::string& username,
   if (hashtag.length() < 2 || hashtag.front() != '#' ||
       hashtag.find(" ") != std::string::npos) {
     return false;
+  }
+
+  std::string from = "";
+
+  while (true) {
+    // Context for the client. It could be used to convey extra information to
+    // the server and/or tweak certain RPC behaviors.
+    ClientContext context;
+
+    // Prepar Stream Request
+    StreamRequest request;
+    request.set_username(username);
+    request.set_hashtag(hashtag);
+    request.set_from(from);
+
+    StreamReply reply;
+
+    std::unique_ptr<ClientReader<StreamReply>> reader(
+        stub_->stream(&context, request));
+
+    while (reader->Read(&reply)) {
+      Chirp chirp = reply.chirp();
+      // If the log is not empty and from has been synchronized, handle response
+      // with chirp
+      if (chirp.id() != kEmptyLodId && from != "") {
+        handle_reponse(chirp)
+      }
+      from = chirp.id();
+    }
+
+    // If there is a error return false to stop the loop
+    Status status = reader.Finish();
+    if (!status.ok()) {
+      return false;
+    }
+
+    std::this_thread::sleep_for(seconds(2))
   }
 
   return true;

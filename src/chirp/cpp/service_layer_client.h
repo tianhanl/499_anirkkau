@@ -1,6 +1,7 @@
 #ifndef SERVICE_LAYER_CLIENT_H
 #define SERVICE_LAYER_CLIENT_H
 
+#include <chrono>
 #include <functional>
 #include <iostream>
 #include <random>
@@ -58,6 +59,10 @@ using chirp::Timestamp;
 // Stream
 using chirp::StreamReply;
 using chirp::StreamRequest;
+using namespace std::chrono;
+
+// Empty log id used to indicate current list is empty
+const std::string& kEmptyLodId = "empty_log";
 
 // gRPC client to communicate with ServiceLayerServiceImpl
 class ServiceLayerClient {
