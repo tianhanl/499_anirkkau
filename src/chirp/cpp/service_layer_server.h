@@ -52,7 +52,7 @@ class ServiceLayerServiceImpl final : public ServiceLayer::Service {
   void CloneChirp(const Chirp& chirp, Chirp* mutable_chirp);
 
   // Check whether text contains hashtag
-  bool containsHashtag(const std::string& text, const std::string& hashtag);
+  bool ContainsHashtag(const std::string& text, const std::string& hashtag);
 
   // Keeps track of every chirp (for Monitor)
   std::vector<std::string> chirp_log_;

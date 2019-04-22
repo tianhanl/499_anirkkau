@@ -210,7 +210,7 @@ Status ServiceLayerServiceImpl::stream(ServerContext* context,
       return Status::OK;
     }
 
-    if (containsHashtag(curr_chirp.text(), hashtag)) {
+    if (ContainsHashtag(curr_chirp.text(), hashtag)) {
       StreamReply stream_reply;
       CloneChirp(curr_chirp, stream_reply.mutable_chirp());
       writer->Write(stream_reply);
@@ -237,7 +237,7 @@ void ServiceLayerServiceImpl::CloneChirp(const Chirp& chirp,
   mutable_chirp->set_username(chirp.username());
 }
 
-bool ServiceLayerServiceImpl::containsHashtag(const std::string& text,
+bool ServiceLayerServiceImpl::ContainsHashtag(const std::string& text,
                                               const std::string& hashtag) {
   std::stringstream text_stream;
   text_stream << text;
