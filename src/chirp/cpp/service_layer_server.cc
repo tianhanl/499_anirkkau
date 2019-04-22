@@ -173,6 +173,8 @@ Status ServiceLayerServiceImpl::stream(ServerContext* context,
       "localhost:50000", grpc::InsecureChannelCredentials()));
   // If no chirps have been created yet, return a special chirp to indicate it
   if (chirp_log_.empty()) {
+    // Empty log id used to indicate current list is empty
+    const std::string& kEmptyLodId = "empty_log";
     StreamReply stream_reply;
     Chirp chirp;
     chirp.set_id(kEmptyLodId);
@@ -188,7 +190,7 @@ Status ServiceLayerServiceImpl::stream(ServerContext* context,
 
   // If `from` is empty, this request is used to synchronize start location
   // in chirp_log_, return last chirp to use its id as from in next request.
-  if (from == "") {
+  if (from.empty()) {
     const std::string& latest_chirp_bytes = chirp_log_.back();
     StreamReply stream_reply;
     Chirp back_chirp;
@@ -207,18 +209,17 @@ Status ServiceLayerServiceImpl::stream(ServerContext* context,
     Chirp curr_chirp;
     curr_chirp.ParseFromString(*currIterator);
     if (from != kEmptyLodId && from == curr_chirp.id()) {
-      return Status::OK;
+      break;
     }
     if (ContainsHashtag(curr_chirp.text(), hashtag)) {
       chirps_with_hashtag.push_back(curr_chirp);
     }
   }
 
-  // Use this list to ensure the chirps is ordered from old to latest
-  std::reverse(chirps_with_hashtag.begin(), chirps_with_hashtag.end());
-  for (const Chirp& chirp : chirps_with_hashtag) {
+  // Use this list to ensure the chirps is ordered from oldest to latest
+  for (int i = chirps_with_hashtag.size() - 1; i >= 0; i--) {
     StreamReply stream_reply;
-    CloneChirp(chirp, stream_reply.mutable_chirp());
+    CloneChirp(chirps_with_hashtag[i], stream_reply.mutable_chirp());
     writer->Write(stream_reply);
   }
 
@@ -244,12 +245,11 @@ void ServiceLayerServiceImpl::CloneChirp(const Chirp& chirp,
 
 bool ServiceLayerServiceImpl::ContainsHashtag(const std::string& text,
                                               const std::string& hashtag) {
-  std::stringstream text_stream;
-  text_stream << text;
+  std::stringstream text_stream(text);
   std::string part;
   // split text by space and check is hashtag a part of text
-  while (std::getline(text_stream, part, ' ')) {
-    if (part == hashtag) {
+  while (text_stream >> part) {
+    if (hashtag.compare(part) == 0) {
       return true;
     }
   }

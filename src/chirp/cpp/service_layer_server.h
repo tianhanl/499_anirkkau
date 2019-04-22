@@ -14,9 +14,6 @@
 #include "service_layer.grpc.pb.h"
 #include "service_layer_client.h"
 
-// Empty log id used to indicate current list is empty
-const std::string& kEmptyLodId = "empty_log";
-
 // ServiceLayer server
 class ServiceLayerServiceImpl final : public ServiceLayer::Service {
  public:
