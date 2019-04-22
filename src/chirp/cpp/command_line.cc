@@ -21,7 +21,7 @@ DEFINE_bool(reply, false, "user wants to reply to chirp");
 DEFINE_bool(read, false, "user wants to read chirp thread");
 DEFINE_bool(monitor, false, "user wants to monitor");
 DEFINE_string(command, "", "read command from command line");
-
+DEFINE_string(stream, "", "stream chirps with hashtag");
 int main(int argc, char** argv) {
   if (argc == 0) {
     std::cout << "Error: Invalid number of arguments." << std::endl;
@@ -101,6 +101,20 @@ int main(int argc, char** argv) {
         std::this_thread::sleep_for(std::chrono::milliseconds(2000));
       }
     }
+
+    if (FLAGS_stream != "") {
+      bool ok =
+          service_client.stream(FLAGS_user, FLAGS_stream, [](Chirp chirp) {
+            std::cout << "Username: " << chirp.username() << std::endl;
+            std::cout << "Text: " << chirp.text() << std::endl;
+            std::cout << std::endl;
+          });
+      if (!ok) {
+        std::cout << "Cannot stream for user " << FLAGS_user << " with hashtag "
+                  << FLAGS_stream << std::endl;
+      }
+    }
+
   } else {
     std::cout << "Error: User flag required" << std::endl;
     return -1;

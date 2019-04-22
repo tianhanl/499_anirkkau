@@ -154,6 +154,14 @@ std::string ServiceLayerClient::monitor(const std::string& username) {
 bool ServiceLayerClient::stream(const std::string& username,
                                 const std::string& hashtag,
                                 std::function<void(Chirp)> handle_response) {
-  // TODO(tianhanl): add implementation of the function
+  // Validates hashtag
+  // A hashtag is defined as any substring, separated by whitespace characters,
+  // where the substring begins with “#” and has one or more non-blank
+  // characters after it.
+  if (hashtag.length() < 2 || hashtag.front() != '#' ||
+      hashtag.find(" ") != std::string::npos) {
+    return false;
+  }
+
   return true;
 }
