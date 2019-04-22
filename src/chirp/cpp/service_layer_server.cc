@@ -166,14 +166,59 @@ Status ServiceLayerServiceImpl::monitor(ServerContext* context,
   return Status::OK;
 }
 
-Status ServiceLayerServiceImpl::stream(
-    ServerContext* context, const StreamRequest* request,
-    ServerWriter< ::chirp::StreamReply>* writer) {
+Status ServiceLayerServiceImpl::stream(ServerContext* context,
+                                       const StreamRequest* request,
+                                       ServerWriter<StreamReply>* writer) {
   KeyValueStoreClient store_client(grpc::CreateChannel(
       "localhost:50000", grpc::InsecureChannelCredentials()));
+  // If no chirps have been created yet, return a special chirp to indicate it
+  if (chirp_log_.empty()) {
+    StreamReply stream_reply;
+    Chirp chirp;
+    chirp.set_id(kEmptyLodId);
+    CloneChirp(chirp, stream_reply.mutable_chirp());
+    writer->Write(stream_reply);
+    return Status::OK;
+  }
+
+  // Extract variables out of request
   const std::string& username = request->username();
   const std::string& hashtag = request->hashtag();
-  // TODO(tianhanl): Add implementaion of stream
+  const std::string& from = request->from();
+
+  // Preserve last chirp used to indicate start in current chirp_log_ traversal
+  auto endIterator = chirp_log_.end();
+
+  // If `from` is empty, this request is used to synchronize start location
+  // in chirp_log_, return last chirp to use its id as from in next request.
+  if (from == "") {
+    const std::string& latest_chirp_bytes = chirp_log_.back();
+    StreamReply stream_reply;
+    Chirp back_chirp;
+    back_chirp.ParseFromString(latest_chirp_bytes);
+    CloneChirp(back_chirp, stream_reply.mutable_chirp());
+    writer->Write(stream_reply);
+    return Status::OK;
+  }
+
+  // Iterate from back of chirp_log_ for new chirps since `from`
+  auto currIterator = endIterator;
+  while (currIterator != chirp_log_.begin()) {
+    --currIterator;
+    StreamReply stream_reply;
+    Chirp curr_chirp;
+    curr_chirp.ParseFromString(*currIterator);
+
+    if (from != kEmptyLodId && from == curr_chirp.id()) {
+      return Status::OK;
+    }
+
+    if (containsHashtag(curr_chirp.text(), hashtag)) {
+      StreamReply stream_reply;
+      CloneChirp(curr_chirp, stream_reply.mutable_chirp());
+      writer->Write(stream_reply);
+    }
+  }
 
   return Status::OK;
 }
@@ -185,6 +230,19 @@ std::string ServiceLayerServiceImpl::GenerateChirpID() {
   CurrentClientID += count_str;
 
   return CurrentClientID;
+}
+
+void ServiceLayerServiceImpl::CloneChirp(const Chirp& chirp,
+                                         Chirp* mutable_chirp) {
+  mutable_chirp->set_text(chirp.text());
+  mutable_chirp->set_id(chirp.id());
+  mutable_chirp->set_parent_id(chirp.parent_id());
+  mutable_chirp->set_username(chirp.username());
+}
+
+bool ServiceLayerServiceImpl::containsHashtag(const std::string& text,
+                                              const std::string& hashtag) {
+  return true;
 }
 
 void RunServer() {

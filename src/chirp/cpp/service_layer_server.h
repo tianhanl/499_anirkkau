@@ -12,6 +12,9 @@
 #include "service_layer.grpc.pb.h"
 #include "service_layer_client.h"
 
+// Empty log id used to indicate current list is empty
+const std::string& kEmptyLodId = "empty_log";
+
 // ServiceLayer server
 class ServiceLayerServiceImpl final : public ServiceLayer::Service {
  public:
@@ -44,6 +47,12 @@ class ServiceLayerServiceImpl final : public ServiceLayer::Service {
   std::string GenerateChirpID();
 
  private:
+  // Clones the content of chirp into mutable_chirp_pointer
+  void CloneChirp(const Chirp& chirp, Chirp* mutable_chirp);
+
+  // Check wether text contains hashtag
+  bool containsHashtag(const std::string& text, const std::string& hashtag);
+
   // Keeps track of every chirp (for Monitor)
   std::vector<std::string> chirp_log_;
 
