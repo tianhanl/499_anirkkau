@@ -1,6 +1,7 @@
 #ifndef SERVICE_SERVER_H
 #define SERVICE_SERVER_H
 
+#include <algorithm>
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -39,7 +40,8 @@ class ServiceLayerServiceImpl final : public ServiceLayer::Service {
   Status monitor(ServerContext* context, const MonitorRequest* request,
                  ServerWriter<MonitorReply>* writer);
 
-  // Handles stream command received from ServiceLayerClient
+  // Handles stream command received from ServiceLayerClient, chirps will be
+  // sent following the order from old to latest
   Status stream(ServerContext* context, const StreamRequest* request,
                 ServerWriter< ::chirp::StreamReply>* writer) override;
 

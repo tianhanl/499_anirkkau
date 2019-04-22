@@ -198,23 +198,28 @@ Status ServiceLayerServiceImpl::stream(ServerContext* context,
     return Status::OK;
   }
 
+  std::vector<Chirp> chirps_with_hashtag;
+
   // Iterate from back of chirp_log_ for new chirps since `from`
   auto currIterator = chirp_log_.end();
   while (currIterator != chirp_log_.begin()) {
     --currIterator;
-    StreamReply stream_reply;
     Chirp curr_chirp;
     curr_chirp.ParseFromString(*currIterator);
-
     if (from != kEmptyLodId && from == curr_chirp.id()) {
       return Status::OK;
     }
-
     if (ContainsHashtag(curr_chirp.text(), hashtag)) {
-      StreamReply stream_reply;
-      CloneChirp(curr_chirp, stream_reply.mutable_chirp());
-      writer->Write(stream_reply);
+      chirps_with_hashtag.push_back(curr_chirp);
     }
+  }
+
+  // Use this list to ensure the chirps is ordered from old to latest
+  std::reverse(chirps_with_hashtag.begin(), chirps_with_hashtag.end());
+  for (const Chirp& chirp : chirps_with_hashtag) {
+    StreamReply stream_reply;
+    CloneChirp(chirp, stream_reply.mutable_chirp());
+    writer->Write(stream_reply);
   }
 
   return Status::OK;
