@@ -186,9 +186,6 @@ Status ServiceLayerServiceImpl::stream(ServerContext* context,
   const std::string& hashtag = request->hashtag();
   const std::string& from = request->from();
 
-  // Preserve last chirp used to indicate start in current chirp_log_ traversal
-  auto endIterator = chirp_log_.end();
-
   // If `from` is empty, this request is used to synchronize start location
   // in chirp_log_, return last chirp to use its id as from in next request.
   if (from == "") {
@@ -202,7 +199,7 @@ Status ServiceLayerServiceImpl::stream(ServerContext* context,
   }
 
   // Iterate from back of chirp_log_ for new chirps since `from`
-  auto currIterator = endIterator;
+  auto currIterator = chirp_log_.end();
   while (currIterator != chirp_log_.begin()) {
     --currIterator;
     StreamReply stream_reply;
@@ -242,7 +239,16 @@ void ServiceLayerServiceImpl::CloneChirp(const Chirp& chirp,
 
 bool ServiceLayerServiceImpl::containsHashtag(const std::string& text,
                                               const std::string& hashtag) {
-  return true;
+  std::stringstream text_stream;
+  text_stream << text;
+  std::string part;
+  // split text by space and check is hashtag a part of text
+  while (std::getline(text_stream, part, ' ')) {
+    if (part == hashtag) {
+      return true;
+    }
+  }
+  return false;
 }
 
 void RunServer() {

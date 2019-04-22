@@ -2,6 +2,7 @@
 #define SERVICE_SERVER_H
 
 #include <iostream>
+#include <sstream>
 #include <string>
 
 #include <grpcpp/grpcpp.h>
