@@ -33,12 +33,11 @@ TEST(ServiceLayerClientStreamInput, HashtagShouldContainNonBlankCharacters) {
 }
 
 // Create a chirp should succeed
-// TEST(ServiceLayerClientStreamInput, InvalidUsernameShouldReturnError) {
-//   ServiceLayerClient client(grpc::CreateChannel(
-//       "localhost:50002", grpc::InsecureChannelCredentials()));
-//   EXPECT_FALSE(client.stream("invalid_username", "#test", [](Chirp chirp)
-//   {}));
-// }
+TEST(ServiceLayerClientStreamInput, InvalidUsernameShouldReturnError) {
+  ServiceLayerClient client(grpc::CreateChannel(
+      "localhost:50002", grpc::InsecureChannelCredentials()));
+  EXPECT_FALSE(client.stream("invalid_username", "#test", [](Chirp chirp) {}));
+}
 
 int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv);

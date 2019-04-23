@@ -5,6 +5,7 @@
 #include <iostream>
 #include <sstream>
 #include <string>
+#include <unordered_set>
 
 #include <grpcpp/grpcpp.h>
 #include <grpcpp/server.h>
@@ -55,6 +56,9 @@ class ServiceLayerServiceImpl final : public ServiceLayer::Service {
 
   // Keeps track of every chirp (for Monitor)
   std::vector<std::string> chirp_log_;
+
+  // Keeps registered users
+  std::unordered_set<std::string> registered_users_;
 
   // Count of chirps
   int chirp_count_ = 0;
