@@ -37,7 +37,7 @@ key_value_store_tests: key_value_store_tests.cc key_value_store.o
 service_layer_tests: service_layer.pb.o service_layer.grpc.pb.o backend_store.pb.o backend_store.grpc.pb.o service_layer_tests.cc key_value_store.o service_layer.o
 	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest -lgflags
 
-service_layer_client_tests: service_layer_client_tests.cc backend_store.pb.o backend_store.grpc.pb.o service_layer.pb.o service_layer.grpc.pb.o backend_store_client.o service_layer_client.o
+service_layer_client_tests: backend_store.pb.o backend_store.grpc.pb.o service_layer.pb.o service_layer.grpc.pb.o backend_store_client.o service_layer_client.o service_layer_client_tests.cc 
 	$(CXX) $^ $(LDFLAGS) -o $@ -lgtest -lgflags
 	
 .PRECIOUS: %.grpc.pb.cc

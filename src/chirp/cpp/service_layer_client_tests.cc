@@ -1,39 +1,46 @@
-#include <gtest/gtest.h>
+
+#include "service_layer_client.h"
+
 #include <iostream>
 #include <string>
 #include <thread>
 
 #include <grpcpp/grpcpp.h>
+#include <gtest/gtest.h>
 #include "backend_store.grpc.pb.h"
 #include "service_layer.grpc.pb.h"
-#include "service_layer_client.h"
+
 using chirp::Chirp;
 using chirp::Timestamp;
 
-// Tests Stream(username, hashtag) method for ServiceLayer
-// When a invalid `username` is given, stream method should return error
-TEST(ServiceLayerClientStream, InvalidUserNameShouldReturnError) {}
+// `hashtag` should begin with '#'
+TEST(ServiceLayerClientStreamInput, HashtagShouldBeginWithHashSign) {
+  ServiceLayerClient client(grpc::CreateChannel(
+      "localhost:50002", grpc::InsecureChannelCredentials()));
+  const std::string username = "HashtagShouldBeginWithHashSign";
+  client.registeruser(username);
+  EXPECT_FALSE(client.stream(username, "test", [](Chirp chirp) {}));
+}
 
-// When a user that current `username` is following sent a chirp not containing
-// `hashtag`, stream function should return a empty vector
-TEST(ServiceLayerClientStream, NonRelatedChirpShouldNotStream) {}
+// `hashtag` should contain one or more nonblank characters after it
+TEST(ServiceLayerClientStreamInput, HashtagShouldContainNonBlankCharacters) {
+  ServiceLayerClient client(grpc::CreateChannel(
+      "localhost:50002", grpc::InsecureChannelCredentials()));
+  const std::string username = "HashtagShouldContainNonBlankCharacters";
+  client.registeruser(username);
+  EXPECT_FALSE(client.stream(username, "#", [](Chirp chirp) {}));
+  EXPECT_FALSE(client.stream(username, "# ", [](Chirp chirp) {}));
+}
 
-// When a user that current `username` is following sent a chrip containing the
-// `hashtag`, stream function should return a vector conains this chirp
-TEST(ServiceLayerClientStream, SingleMatchingHashtagChirpShouldWork) {}
+// Create a chirp should succeed
+// TEST(ServiceLayerClientStreamInput, InvalidUsernameShouldReturnError) {
+//   ServiceLayerClient client(grpc::CreateChannel(
+//       "localhost:50002", grpc::InsecureChannelCredentials()));
+//   EXPECT_FALSE(client.stream("invalid_username", "#test", [](Chirp chirp)
+//   {}));
+// }
 
-// When multiple users that `username` is following sent chirps containing the
-// `hashtag`, stream function should return a vector conains those
-// chirps
-TEST(ServiceLayerClientStream, MultipleMatchingHashtagChirpShouldWork) {}
-
-// When a user that current `username` is following sent a chrip containing
-// multiple hashtags and one of them is `hashtag`, stream function should return
-// a vector conains this chirp
-TEST(ServiceLayerClientStream,
-     ChirpWithMultipleHashtagShouldWorkForSingleMatching) {}
-
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
   testing::InitGoogleTest(&argc, argv);
   return RUN_ALL_TESTS();
 }
