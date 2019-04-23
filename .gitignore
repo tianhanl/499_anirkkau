@@ -11,4 +11,5 @@ command_line
 key_value_store_tests
 service_layer_server
 service_layer_tests
+service_layer_client_tests
 .nfs*

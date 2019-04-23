@@ -26,6 +26,7 @@ Status ServiceLayerServiceImpl::registeruser(ServerContext* context,
 
   std::string response = store_client.put(new_user, value, type);
   if (response == "success") {
+    registered_users_.insert(new_user);
     return Status::OK;
   } else {
     return Status::CANCELLED;
@@ -169,6 +170,16 @@ Status ServiceLayerServiceImpl::monitor(ServerContext* context,
 Status ServiceLayerServiceImpl::stream(ServerContext* context,
                                        const StreamRequest* request,
                                        ServerWriter<StreamReply>* writer) {
+  // Extract variables out of request
+  const std::string& username = request->username();
+  const std::string& hashtag = request->hashtag();
+  const std::string& from = request->from();
+
+  // Check is user registered
+  if (registered_users_.find(username) == registered_users_.end()) {
+    return Status::CANCELLED;
+  }
+
   // Empty log id used to indicate current list is empty
   const std::string& kEmptyLodId = "empty_log";
 
@@ -183,12 +194,6 @@ Status ServiceLayerServiceImpl::stream(ServerContext* context,
     writer->Write(stream_reply);
     return Status::OK;
   }
-
-  // Extract variables out of request
-  const std::string& username = request->username();
-  const std::string& hashtag = request->hashtag();
-  const std::string& from = request->from();
-
   // If `from` is empty, this request is used to synchronize start location
   // in chirp_log_, return last chirp to use its id as from in next request.
   if (from.empty()) {
