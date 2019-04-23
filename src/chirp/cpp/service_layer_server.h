@@ -1,7 +1,9 @@
 #ifndef SERVICE_SERVER_H
 #define SERVICE_SERVER_H
 
+#include <algorithm>
 #include <iostream>
+#include <sstream>
 #include <string>
 
 #include <grpcpp/grpcpp.h>
@@ -35,7 +37,8 @@ class ServiceLayerServiceImpl final : public ServiceLayer::Service {
   Status monitor(ServerContext* context, const MonitorRequest* request,
                  ServerWriter<MonitorReply>* writer);
 
-  // Handles stream command received from ServiceLayerClient
+  // Handles stream command received from ServiceLayerClient, chirps will be
+  // sent following the order from old to latest
   Status stream(ServerContext* context, const StreamRequest* request,
                 ServerWriter< ::chirp::StreamReply>* writer) override;
 
@@ -44,6 +47,12 @@ class ServiceLayerServiceImpl final : public ServiceLayer::Service {
   std::string GenerateChirpID();
 
  private:
+  // Clones the content of chirp into mutable_chirp_pointer
+  void CloneChirp(const Chirp& chirp, Chirp* mutable_chirp);
+
+  // Check whether text contains hashtag
+  bool ContainsHashtag(const std::string& text, const std::string& hashtag);
+
   // Keeps track of every chirp (for Monitor)
   std::vector<std::string> chirp_log_;
 
