@@ -169,12 +169,13 @@ Status ServiceLayerServiceImpl::monitor(ServerContext* context,
 Status ServiceLayerServiceImpl::stream(ServerContext* context,
                                        const StreamRequest* request,
                                        ServerWriter<StreamReply>* writer) {
+  // Empty log id used to indicate current list is empty
+  const std::string& kEmptyLodId = "empty_log";
+
   KeyValueStoreClient store_client(grpc::CreateChannel(
       "localhost:50000", grpc::InsecureChannelCredentials()));
   // If no chirps have been created yet, return a special chirp to indicate it
   if (chirp_log_.empty()) {
-    // Empty log id used to indicate current list is empty
-    const std::string& kEmptyLodId = "empty_log";
     StreamReply stream_reply;
     Chirp chirp;
     chirp.set_id(kEmptyLodId);

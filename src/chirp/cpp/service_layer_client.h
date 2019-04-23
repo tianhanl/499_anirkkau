@@ -1,6 +1,7 @@
 #ifndef SERVICE_LAYER_CLIENT_H
 #define SERVICE_LAYER_CLIENT_H
 
+#include <chrono>
 #include <functional>
 #include <iostream>
 #include <random>
@@ -58,6 +59,7 @@ using chirp::Timestamp;
 // Stream
 using chirp::StreamReply;
 using chirp::StreamRequest;
+using namespace std::chrono;
 
 // gRPC client to communicate with ServiceLayerServiceImpl
 class ServiceLayerClient {
