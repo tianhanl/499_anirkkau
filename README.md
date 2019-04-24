@@ -110,6 +110,7 @@ Register
 
 (user must be registered to perform any other commands)
 Chirp
+**chirp with hashtags should be wrapped in double quotes, EX. "test #test"**
 
 ```
   $ ./command_line --user <username> --chirp <chirp text>
@@ -137,6 +138,13 @@ Monitor
 
 ```
   $ ./command_line --user <username> --monitor
+```
+
+Stream
+**hashtag should be wrapped in double quotes, EX. "#test"**
+
+```bash
+./command_line --user <username> --stream <hashtag>
 ```
 
 **Cleaning:**
