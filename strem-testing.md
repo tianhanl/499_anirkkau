@@ -30,7 +30,7 @@ Client inputs are covered by `service_layer_client_tests`
 ./command_line --user b --chirp "test"
 ```
 
-a should not print any chirps
+a stream(#a) should not print any chirp
 
 ### Case 2: Single User, Single Sender, Matching chirp with one hashtag
 
@@ -41,7 +41,7 @@ a should not print any chirps
 ./command_line --user b --chirp "test #a"
 ```
 
-a should print the matching chirp
+a stream(#a) should print the matching chirp
 
 ```
 Username: b
@@ -59,7 +59,7 @@ Text: test #a
 ./command_line --user b --chirp "test2 #a"
 ```
 
-a should only print the matching chirp after `stream`
+a stream(#a) should only print the matching chirp after `stream`
 
 ```
 Username: b
@@ -75,7 +75,7 @@ Text: test2 #a
 ./command_line --user b --chirp "test #a #b #c"
 ```
 
-a should print the matching chirp
+a stream(#a) should print the matching chirp
 
 ```
 Username: b
@@ -119,14 +119,14 @@ Text: test #a #b #c
 ./command_line --user b --chirp "test #a #b #c"
 ```
 
-a should print the matching chirp
+a stream(#a) should print the matching chirp
 
 ```
 Username: b
 Text: test #a #b #c
 ```
 
-c should print the matching chirp
+a stream(#c)should print the matching chirp
 
 ```
 Username: b
@@ -145,14 +145,14 @@ Text: test #a #b #c
 ./command_line --user b --chirp "test #a #b #c"
 ```
 
-a should print the matching chirp
+a stream(#a) should print the matching chirp
 
 ```
 Username: b
 Text: test #a #b #c
 ```
 
-c should print the matching chirp
+c stream(#a) should print the matching chirp
 
 ```
 Username: b
