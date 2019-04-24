@@ -1,8 +1,10 @@
-# CS-499 Chirp Project Phase 2
+# CS-499 Chirp Project Phase 3
 
 ### Author: Anirudh Kaushik
 
 ### Email: anirkkau@usc.edu
+
+### Modified By: Tianhang Liu (tianhanl@usc.edu)
 
 ## Setting up Vagrant:
 
@@ -83,7 +85,7 @@ To run tests, follow these commands:
 
 All functionality is designed according to the Chirp Documentation. Commands will not work together and must be done one at a time.
 
-### Tests for `stream`
+### Tests for `stream` (tianhanl)
 
 Since current tested `service_layer` is not used in `service_layer_server`,  
 the logic for handling request is coupled with the networking layer. The testing
@@ -100,6 +102,10 @@ for `stream` function will be integration tests for service layer using
 ./service_layer_client_tests
 ```
 
+Due to difficulty in testing multi-threaded function interaction, I resort to
+manual testing using `command_line`. Please refer to `stream-testing.md` for
+test cases and expected results.
+
 ## Command Line Reference
 
 Register
@@ -110,6 +116,7 @@ Register
 
 (user must be registered to perform any other commands)
 Chirp
+**chirp with hashtags should be wrapped in double quotes, EX. "test #test"**
 
 ```
   $ ./command_line --user <username> --chirp <chirp text>
@@ -137,6 +144,13 @@ Monitor
 
 ```
   $ ./command_line --user <username> --monitor
+```
+
+Stream
+**hashtag should be wrapped in double quotes, EX. "#test"**
+
+```bash
+./command_line --user <username> --stream <hashtag>
 ```
 
 **Cleaning:**
